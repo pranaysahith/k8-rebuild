@@ -1,0 +1,6 @@
+[submodule "sow-rest-api"]
+	path = sow-rest-api
+	url = https://github.com/k8-proxy/sow-rest-api
+[submodule "sow-rest-UI"]
+	path = sow-rest-UI
+	url = https://github.com/k8-proxy/sow-rest-UI
