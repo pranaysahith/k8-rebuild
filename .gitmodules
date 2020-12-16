@@ -4,6 +4,3 @@
 [submodule "sow-rest-UI"]
 	path = sow-rest-UI
 	url = https://github.com/k8-proxy/sow-rest-UI
-[submodule "sow-rest-java-api"]
-	path = sow-rest-api
-	url = https://github.com/k8-proxy/k8-java-api-code-samples
