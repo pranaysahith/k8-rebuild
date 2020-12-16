@@ -1,0 +1,11 @@
+apiVersion: v2
+name: sow-rest
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+maintainers:
+  - email: hrsi88@gmail.com
+    name: Yarden Shoham
+sources:
+  - https://github.com/k8-proxy/sow-rest-api
+  - https://github.com/k8-proxy/sow-rest-UI
