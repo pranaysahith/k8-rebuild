@@ -16,6 +16,7 @@
         "ssh_username": "ubuntu",
         "ssh_timeout": "20m",
         "type": "amazon-ebs",
+        "ami_regions": ["eu-west-2", "eu-west-1"],
         "source_ami_filter": {
             "filters": {
             "virtualization-type": "hvm",
