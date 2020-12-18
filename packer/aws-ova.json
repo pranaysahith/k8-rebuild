@@ -4,7 +4,6 @@
       "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
       "region": "eu-west-2",
       "vm_name": "k8-rebuild",
-      "source_ami": "ami-02902da5bc511e5dd",
       "github_sha": null
     },
     "builders": [
@@ -14,10 +13,18 @@
         "instance_type": "t3.large",
         "region": "{{user `region`}}",
         "secret_key": "{{user `aws_secret_key`}}",
-        "source_ami": "{{user `source_ami`}}",
         "ssh_username": "ubuntu",
         "ssh_timeout": "20m",
         "type": "amazon-ebs",
+        "source_ami_filter": {
+            "filters": {
+            "virtualization-type": "hvm",
+            "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*",
+            "root-device-type": "ebs"
+            },
+            "owners": ["099720109477"],
+            "most_recent": true
+         },
         "security_group_ids": "sg-01230a8d723efa0b3",
         "launch_block_device_mappings": [
           {

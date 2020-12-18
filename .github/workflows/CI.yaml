@@ -15,7 +15,10 @@ jobs:
   build-and-release-ova:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: true
+      matrix:
+        region: ["eu-west-2", "eu-west-1"]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
@@ -27,6 +30,6 @@ jobs:
       uses: operatehappy/packer-github-actions@master
       with:
         command: build
-        arguments: "-color=false -on-error=cleanup -var github_sha=${{ github.sha }} -var source_ami=ami-02902da5bc511e5dd -var vm_name=k8-rebuild -var aws_access_key=${{ secrets.AWS_ACCESS_KEY }} -var aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        arguments: "-color=false -on-error=cleanup -var github_sha=${{ github.sha }} -var vm_name=k8-rebuild -var region=${{ matrix.region }} -var aws_access_key=${{ secrets.AWS_ACCESS_KEY }} -var aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         target: packer/aws-ova.json
 
