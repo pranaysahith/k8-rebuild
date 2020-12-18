@@ -21,8 +21,6 @@ jobs:
 
     # Checks-out your repository under $GITHUB_WORKSPACE/vmware-scripts, so your job can access it  
     - uses: actions/checkout@v2
-      with:
-        path: k8-rebuild
 
     # build artifact
     - name: Build Artifact
