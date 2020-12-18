@@ -16,7 +16,7 @@
         "ssh_username": "ubuntu",
         "ssh_timeout": "20m",
         "type": "amazon-ebs",
-        "ami_regions": ["eu-west-2", "eu-west-1"],
+        "ami_regions": ["eu-west-1"],
         "source_ami_filter": {
             "filters": {
             "virtualization-type": "hvm",
@@ -26,6 +26,15 @@
             "owners": ["099720109477"],
             "most_recent": true
          },
+        "tags": {
+            "OS_Version": "Ubuntu-20.04",
+            "Base_AMI_Name": "{{ .SourceAMIName }}"
+        },
+        "run_tags": {
+            "Name": "Packer Builder k8-rebuild",
+            "Team": "k8-proxy/k8-rebuild",
+            "Owner": "githubactionAMIpacker"
+        },
         "security_group_ids": "sg-01230a8d723efa0b3",
         "launch_block_device_mappings": [
           {
