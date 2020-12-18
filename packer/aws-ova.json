@@ -1,0 +1,47 @@
+{
+    "variables": {
+      "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+      "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+      "region": "eu-west-2",
+      "vm_name": "k8-rebuild",
+      "source_ami": "ami-02902da5bc511e5dd",
+      "github_sha": null
+    },
+    "builders": [
+      {
+        "access_key": "{{user `aws_access_key`}}",
+        "ami_name": "{{user `vm_name`}}-{{user `github_sha`}}",
+        "instance_type": "t3.large",
+        "region": "{{user `region`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "source_ami": "{{user `source_ami`}}",
+        "ssh_username": "ubuntu",
+        "ssh_timeout": "20m",
+        "type": "amazon-ebs",
+        "security_group_ids": "sg-01230a8d723efa0b3",
+        "launch_block_device_mappings": [
+          {
+            "device_name": "/dev/sda1",
+            "volume_type": "gp2",
+            "delete_on_termination": true
+          }
+        ]
+      }
+    ],
+      "provisioners": [
+        {
+            "type": "file",
+            "source":"./packer/setup",
+            "destination":"/tmp/"
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "chmod +x /tmp/setup/setup.sh",
+                "cd /tmp/setup",
+                "./setup.sh"
+            ]
+        }
+      ]
+  }
+  
