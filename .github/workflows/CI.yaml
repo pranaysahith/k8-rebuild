@@ -29,3 +29,40 @@ jobs:
         arguments: "-color=false -on-error=cleanup -var github_sha=${{ github.sha }} -var vm_name=k8-rebuild -var region=eu-west-2 -var aws_access_key=${{ secrets.AWS_ACCESS_KEY }} -var aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         target: packer/aws-ova.json
 
+  test_ami:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy VM to dev
+        id: deploy
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-2
+        run: |
+          aws ec2 run-instances --image-id $(aws ec2 describe-images --filters "Name=name,Values=glasswall-k8s-${{ github.sha }}" --query 'Images[*].[ImageId]' --output text) --count 1 --instance-type t2.large --key-name Pranay --security-group-ids sg-00c842d3a9cb6a05d --tag-specifications 'ResourceType=instance, Tags=[{Key=Name,Value=k8-rebuild}, {Key=Team, Value=k8-proxy/k8-rebuild}, {Key=Owner, Value=githubactionAMIpacker}]'
+          ami_id=$(aws ec2 describe-images --filters "Name=name,Values=k8-rebuild-${{ github.sha }}" --query 'Images[*].[ImageId]' --output text)
+          result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.small --key-name Pranay --security-group-ids sg-00c842d3a9cb6a05d --tag-specifications 'ResourceType=instance, Tags=[{Key=Name,Value=k8-rebuild}, {Key=Team, Value=k8-proxy/k8-rebuild}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_Name, Value=k8-rebuild-${{ github.sha }}}]')
+          sleep 120s
+          instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
+          instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
+          instance_state=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].State.Name")
+          echo "Instance state is $instance_state"
+          if [[ "$instance_state" != "running" ]];then
+              echo "EC2 instance $instance_id created from AMI has failed to start in time, terminating the instance." 
+              aws ec2 terminate-instances --instance-ids $instance_id
+              exit -1
+          fi
+          echo ::set-output name=instance_id::$instance_id
+
+      - name: Run tests on the VM
+        run: |
+          echo "Add api tests here for ${{ steps.deploy.outputs.instance_id }}"
+      
+      - name: Delete the VM
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-2
+        run: |
+          instance_id="${{ steps.deploy.outputs.instance_id }}"
+          aws ec2 terminate-instances --instance-ids $instance_id
