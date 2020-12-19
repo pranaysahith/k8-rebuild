@@ -58,6 +58,11 @@
                 "cd /tmp/setup",
                 "./setup.sh"
             ]
+        },
+        {
+            "type": "shell",
+            "script": "./packer/setup/cleanup.sh",
+            "execute_command": "chmod +x {{.Path}}; sudo {{.Path}}"
         }
       ]
   }
