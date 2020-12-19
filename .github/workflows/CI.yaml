@@ -33,14 +33,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-release-ova
     steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-east-2
       - name: Deploy VM to dev
         id: deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-2
         run: |
           aws ec2 run-instances --image-id $(aws ec2 describe-images --filters "Name=name,Values=glasswall-k8s-${{ github.sha }}" --query 'Images[*].[ImageId]' --output text) --count 1 --instance-type t2.large --key-name Pranay --security-group-ids sg-00c842d3a9cb6a05d --tag-specifications 'ResourceType=instance, Tags=[{Key=Name,Value=k8-rebuild}, {Key=Team, Value=k8-proxy/k8-rebuild}, {Key=Owner, Value=githubactionAMIpacker}]'
           ami_id=$(aws ec2 describe-images --filters "Name=name,Values=k8-rebuild-${{ github.sha }}" --query 'Images[*].[ImageId]' --output text)
@@ -62,6 +60,10 @@ jobs:
           echo "Add api tests here for ${{ steps.deploy.outputs.instance_id }}"
       
       - name: Delete the VM
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-west-2
         run: |
           instance_id="${{ steps.deploy.outputs.instance_id }}"
           aws ec2 terminate-instances --instance-ids $instance_id
