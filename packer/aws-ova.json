@@ -71,7 +71,8 @@
         },
         {
             "type": "shell-local",
-            "script": "./packer/ova-check.sh k8-rebuild-{{user `github_sha`}}"
+            "environment_vars": ["OVA_NAME=k8-rebuild-{{user `github_sha`}}"],
+            "script": "./packer/ova-check.sh"
         }
       ]
   }

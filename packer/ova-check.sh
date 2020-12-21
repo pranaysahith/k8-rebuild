@@ -1,5 +1,4 @@
 #!/bin/bash
-OVA_NAME=$1
 EXPORT_ID=$(cat out.json | jq -r .[].ExportTaskId)
 echo $EXPORT_ID
 # increase file size until 1KB
