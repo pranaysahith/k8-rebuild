@@ -30,6 +30,7 @@ jobs:
     - name: Run unit tests
       run: |
         sudo apt-get install -y dotnet-sdk-3.1
+        cd k8-rebuild-rest-api/Glasswall.CloudSdk.AWS.Rebuild.Tests
         dotnet restore
         dotnet tests
 
