@@ -21,6 +21,18 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it  
     - uses: actions/checkout@v2
 
+    - name: Checkout submodules
+      uses: actions/checkout@v2
+      with:
+        repository: k8-proxy/k8-rebuild-rest-api
+        path: k8-rebuild-rest-api
+
+    - name: Run unit tests
+      run: |
+        sudo apt-get install -y dotnet-sdk-3.1
+        dotnet restore
+        dotnet tests
+
     # build artifact
     - name: Build Artifact
       uses: operatehappy/packer-github-actions@master
