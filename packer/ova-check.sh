@@ -1,4 +1,5 @@
 #!/bin/bash
+OVA_NAME=$1
 EXPORT_ID=$(cat out.json | jq -r .[].ExportTaskId)
 echo $EXPORT_ID
 # increase file size until 1KB
@@ -14,7 +15,7 @@ done
 
 echo "Upload Completed !!!"
 
-PROFILE=default
-BUCKET=packer-data
+BUCKET=$(cat packer/ova-export.json | jq -r .S3Bucket)
 
-OBJECT="$(aws s3 ls --profile $PROFILE $BUCKET/vms/ | sort | tail -n 1 | awk '{print $4}')"
+OBJECT="$(aws s3 ls $BUCKET/vms/SOW-REST/ | sort | tail -n 1 | awk '{print $4}')"
+aws s3 mv s3://${BUCKET}/vms/SOW-REST/${OBJECT} s3://${BUCKET}/vms/SOW-REST/${OVA_NAME}

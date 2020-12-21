@@ -2,8 +2,9 @@
     "variables": {
       "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
       "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-      "region": "eu-west-2",
+      "region": "eu-west-1",
       "vm_name": "k8-rebuild",
+      "security_group_ids": "sg-0120400d5eefb0b9e",
       "github_sha": null
     },
     "builders": [
@@ -15,7 +16,6 @@
         "secret_key": "{{user `aws_secret_key`}}",
         "ssh_username": "ubuntu",
         "ssh_timeout": "20m",
-        "ssh_clear_authorized_keys": true,
         "type": "amazon-ebs",
         "ami_regions": ["eu-west-1"],
         "source_ami_filter": {
@@ -36,7 +36,7 @@
             "Team": "k8-proxy/k8-rebuild",
             "Owner": "githubactionAMIpacker"
         },
-        "security_group_ids": "sg-01230a8d723efa0b3",
+        "security_group_ids": "{{user `security_group_ids`}}",
         "launch_block_device_mappings": [
           {
             "device_name": "/dev/sda1",
@@ -67,11 +67,11 @@
         },
         {
              "type": "shell-local",
-             "inline": "aws ec2 create-instance-export-task --region eu-west-1 --instance-id {{build `ID`}} --target-environment vmware --export-to-s3-task file://file.json > out.json"
+             "inline": "aws ec2 create-instance-export-task --region {{user `region`}} --instance-id {{build `ID`}} --target-environment vmware --export-to-s3-task file://packer/ova-export.json > out.json"
         },
         {
             "type": "shell-local",
-            "script": "./packer/ova-check.sh"
+            "script": "./packer/ova-check.sh k8-rebuild-{{user `github_sha`}}"
         }
       ]
   }
