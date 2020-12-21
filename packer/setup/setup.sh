@@ -74,6 +74,7 @@ spec:
 {{- end -}}
 EOF
 cat >> kubernetes/values.yaml <<EOF
+
 sow-rest-api:
   image:
     registry: localhost:30500
