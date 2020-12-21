@@ -33,7 +33,7 @@ jobs:
         sudo apt-get install -y dotnet-sdk-3.1
         cd k8-rebuild-rest-api/Glasswall.CloudSdk.AWS.Rebuild.Tests
         dotnet restore
-        dotnet test
+        # dotnet test
 
     # build artifact
     - name: Build Artifact
