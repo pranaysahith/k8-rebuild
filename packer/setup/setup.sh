@@ -77,7 +77,7 @@ cat >> kubernetes/values.yaml <<EOF
 sow-rest-api:
   image:
     registry: localhost:30500
-    repository: sow-rest-ui
+    repository: sow-rest-api
     imagePullPolicy: Never
     tag: latest
 sow-rest-ui:
