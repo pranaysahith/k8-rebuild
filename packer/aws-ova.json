@@ -71,7 +71,7 @@
         },
         {
             "type": "shell-local",
-            "script": "ova-check.sh"
+            "script": "./packer/ova-check.sh"
         }
       ]
   }
