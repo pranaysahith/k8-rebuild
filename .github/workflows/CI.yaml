@@ -71,6 +71,7 @@ jobs:
           result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.large --key-name k8-rebuild --security-group-ids sg-0120400d5eefb0b9e --tag-specifications 'ResourceType=instance, Tags=[{Key=Name,Value=dev-k8-rebuild}, {Key=Team, Value=k8-proxy/k8-rebuild}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_Name, Value=k8-rebuild-${{ github.sha }}}]')
           sleep 120s
           instance_id=$(echo $result | jq -r ".Instances[0].InstanceId")
+          echo "$instance_id is created."
           instance_description=$(aws ec2 describe-instances --instance-ids $instance_id)
           instance_state=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].State.Name")
           echo "Instance state is $instance_state"
@@ -79,6 +80,8 @@ jobs:
               aws ec2 terminate-instances --instance-ids $instance_id
               exit -1
           fi
+          instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
+          echo "Access the application at http://${instance_ip}"
 
       - name: Run tests on the VM
         run: |
