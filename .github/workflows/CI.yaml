@@ -36,7 +36,7 @@ jobs:
         # dotnet test
 
     # build artifact
-    - name: Build Artifact
+    - name: Build AMI and OVA
       uses: operatehappy/packer-github-actions@master
       with:
         command: build
