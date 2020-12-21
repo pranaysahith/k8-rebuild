@@ -1,6 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 
 name: CI
+env:
+  AWS_DEFAULT_REGION: eu-west-1
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
@@ -40,7 +42,7 @@ jobs:
       uses: operatehappy/packer-github-actions@master
       with:
         command: build
-        arguments: "-color=false -on-error=cleanup -var github_sha=${{ github.sha }} -var vm_name=k8-rebuild -var region=eu-west-1 -var aws_access_key=${{ secrets.AWS_ACCESS_KEY }} -var aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        arguments: "-color=false -on-error=cleanup -var github_sha=${{ github.sha }} -var vm_name=k8-rebuild -var region=${{ env.AWS_DEFAULT_REGION }} -var aws_access_key=${{ secrets.AWS_ACCESS_KEY }} -var aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         target: packer/aws-ova.json
 
   test-ami:
@@ -52,7 +54,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-2
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
         run: |
           # instance_id="${{ steps.deploy.outputs.instance_id }}"
           instance_id=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=dev-k8-rebuild' --output text --query 'Reservations[*].Instances[*].InstanceId')
@@ -63,7 +65,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-2
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
         run: |
           ami_id=$(aws ec2 describe-images --filters "Name=name,Values=k8-rebuild-${{ github.sha }}" --query 'Images[*].[ImageId]' --output text)
           result=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type t2.small --key-name k8-rebuild --security-group-ids sg-00c842d3a9cb6a05d --tag-specifications 'ResourceType=instance, Tags=[{Key=Name,Value=dev-k8-rebuild}, {Key=Team, Value=k8-proxy/k8-rebuild}, {Key=Owner, Value=githubactionAMIpacker}, {Key=AMI_Name, Value=k8-rebuild-${{ github.sha }}}]')
@@ -85,10 +87,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-west-2
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
         run: |
           instance_id="${{ steps.get_id.outputs.instance_id }}"
           if [[ ! -z "$instance_id" ]]; then
             aws ec2 terminate-instances --instance-ids $instance_id
           fi
-          
