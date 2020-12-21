@@ -1,13 +1,15 @@
-version: "3.8"
+version: "3.9"
 services:
-  api:
-    image: yardenshoham/sow-rest-api
+  k8-rebuild-rest-api:
+    build:
+      context: ./k8-rebuild-rest-api
+      dockerfile: Source/Service/Dockerfile
+    ports:
+      - 8888:80
     restart: unless-stopped
-  ui:
-    image: yardenshoham/sow-rest-ui
+  k8-rebuild-file-drop:
+    build: ./k8-rebuild-file-drop/app
     restart: unless-stopped
-    depends_on:
-      - api
   reverse-proxy:
     image: nginx:alpine
     restart: unless-stopped
@@ -15,8 +17,5 @@ services:
       - NGINX_ENTRYPOINT_QUIET_LOGS=1
     ports:
       - 80:80
-    depends_on:
-      - api
-      - ui
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
