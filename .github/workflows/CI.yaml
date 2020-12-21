@@ -39,7 +39,7 @@ jobs:
           # echo "Add api tests here for ${{ steps.deploy.outputs.instance_id }}"
           # instance_ip="${{ steps.deploy.outputs.instance_ip }}"
           instance_ip="54.76.166.7"
-          cd vmware-scripts
+          cd vmware-scripts/HealthFunctionalTests/filedrop
           npm install
-          sed -i "s/3.133.161.191/$instance_ip/g" HealthFunctionalTests/filedrop/cypress/integration/filedrop.spec.js
+          sed -i "s/3.133.161.191/$instance_ip/g" cypress/integration/filedrop.spec.js
           npm test
