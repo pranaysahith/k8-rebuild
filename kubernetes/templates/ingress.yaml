@@ -1,0 +1,17 @@
+{{ if (eq .Values.nginx.service.type "ClusterIP") }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8-rebuild
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sow-rest
+            port: 
+              number: 80
+{{- end -}}
