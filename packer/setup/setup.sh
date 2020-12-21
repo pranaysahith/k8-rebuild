@@ -28,6 +28,3 @@ sleep 60s
 helm upgrade --install sow-rest kubernetes/
 # let helm chart be installed
 sleep 60s
-
-# install aws cli
-pip install aws-cli
