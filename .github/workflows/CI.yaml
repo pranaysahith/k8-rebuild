@@ -26,6 +26,7 @@ jobs:
       with:
         repository: k8-proxy/k8-rebuild-rest-api
         path: k8-rebuild-rest-api
+        submodules: true
 
     - name: Run unit tests
       run: |
