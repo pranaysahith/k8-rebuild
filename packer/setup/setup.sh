@@ -94,4 +94,4 @@ helm upgrade --install k8-rebuild \
   --atomic kubernetes/
 
 # delete docker-registry helm chart
-helm delete docker-registry
+# helm delete docker-registry
