@@ -92,6 +92,10 @@ jobs:
           path: vmware-scripts
 
       - name: Run tests on the VM
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
         run: |
           instance_id="${{ steps.deploy.outputs.instance_id }}"
           instance_ip="${{ steps.deploy.outputs.instance_ip }}"
@@ -99,11 +103,22 @@ jobs:
           cd vmware-scripts/HealthFunctionalTests/filedrop
           npm install
           sed -i "s/3.133.161.191/$instance_ip/g" cypress/integration/filedrop.spec.js
-          npm test 2>&1 | grep ' All specs passed! ' || true # bypassing failure because of a bug in cypress
-          test_status=$?
-          echo "Tests are successfully on new VM, terminating old instance."
+          npm test
+          echo "Tests are successfully on the new instance, terminating old instance."
           aws ec2 create-tags --resources $ami_id --tags Key=Test_Result,Value=Success
           instance_id="${{ steps.get_id.outputs.instance_id }}"
           if [[ ! -z "$instance_id" ]]; then
             aws ec2 terminate-instances --instance-ids $instance_id
           fi
+
+      - name: Delete instance if tests fail
+        if: ${{ failure() }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+        run: |
+          echo "Failed integration tests, terminating the newly deployed VM"
+          instance_id="${{ steps.deploy.outputs.instance_id }}"
+          aws ec2 terminate-instances $instance_id
+          aws ec2 create-tags --resources $ami_id --tags Key=Test_Result,Value=Failed
