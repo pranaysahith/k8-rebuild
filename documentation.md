@@ -30,7 +30,26 @@ docker-compose up --build
 Make sure `git submodule update --init --recursive --progress` finished successufully on your network (in case you have McAfee it may need to be disabled) .
 The service will be available on `http://localhost`.
 
-
+### Deployment of *K8-REBUILD* Using Kubernetes
+- Deploy rancher server using docker    
+    ```
+    docker run -d --restart=unless-stopped \
+    -p 8080:80 -p 8443:443 \
+    --privileged \
+    rancher/rancher:latest
+    ```
+- Create new cluster
+- Select etcd, control plane and worker to make sure they are installed in at least 1 node.
+- Test the cluster deployment
+    - Select and open the cluster to be tested. On the right top, click on "Kubeconfig File" and copy the config file data.
+    - Create a local file called `kubeconfig` and paste the copied data.
+    - Use this file to connect to the cluster by running below commands. Please note, in the below command the KUBECONFIG variable should be set to the path of kubeconfig file created in the previous step. It is easy to connect to the cluster, if the file is merged with `~/.kube/config`.
+        ```
+        export KUBECONFIG=kubeconfig
+        kubectl get nodes
+        kubectl get all --all-namespaces
+        ```
+    - Once cluster is ready, run `helm install k8-rebuild kubernetes`
 ## Use cases
 
 - Process images that are retrieved from un-trusted sources
@@ -38,4 +57,4 @@ The service will be available on `http://localhost`.
 - Detect when files get dropped > get the file > unzip it > put all the files thought the Glasswall engine > capture all rebuilt files in one folder > capture all xml files in another folder > zip both folders > upload zip files to another S3 location 
 
 Whole process can be verified using the healthchecks:
-[Health Check](https://glasswallsolu-qbp1117.slack.com/files/U019TEM94L9/F01GZ8B7T8F/health_checks_and_functional_health_checks.mp4)
+[Health Check](https://www.youtube.com/watch?v=SaoC-gYxzJY)
