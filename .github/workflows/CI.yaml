@@ -40,8 +40,8 @@ jobs:
           # instance_ip="${{ steps.deploy.outputs.instance_ip }}"
           instance_ip="54.75.57.181"
           cd vmware-scripts/HealthFunctionalTests/filedrop
-          npm install
+          npm ci
           sed -i "s/3.133.161.191/$instance_ip/g" cypress/integration/filedrop.spec.js
-          npm test
+          npm test 2>&1 | grep ' All specs passed! '
           test_status=$(echo $?)
           echo "test_status is $test_status"
