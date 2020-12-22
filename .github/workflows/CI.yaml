@@ -109,7 +109,7 @@ jobs:
           aws ec2 create-tags --resources $ami_id --tags Key=Test_Result,Value=Success
           instance_id="${{ steps.get_id.outputs.instance_id }}"
           if [[ ! -z "$instance_id" ]]; then
-            echo "$instance_id" | while IFS= read -r line ; do aws ec2 terminate-instances --instance-ids $line; done
+            echo "$instance_id" | while IFS= read -r line ; do aws ec2 terminate-instances --instance-ids $line || true; done
           fi
 
       - name: Delete instance if tests fail
