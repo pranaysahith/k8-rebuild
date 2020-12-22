@@ -6,6 +6,7 @@
 
 # install k3s
 curl -sfL https://get.k3s.io | sh -
+mkdir ~/.kube && sudo install -T /etc/rancher/k3s/k3s.yaml ~/.kube/config -m 600 -o $USER
 
 # install kubectl and helm
 curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -16,9 +17,8 @@ echo "Done installing kubectl"
 curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 echo "Done installing helm"
 
-# install helm chart
+# get source code
 git clone https://github.com/k8-proxy/k8-rebuild.git --recursive && cd k8-rebuild && git submodule foreach git pull origin main
-mkdir ~/.kube && sudo install -T /etc/rancher/k3s/k3s.yaml ~/.kube/config -m 600 -o $USER
 
 # build docker images
 sudo apt-get install \
