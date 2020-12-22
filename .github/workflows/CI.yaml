@@ -47,7 +47,7 @@ jobs:
 
   deploy-ami:
     runs-on: ubuntu-latest
-    needs: build-and-release-ova
+    needs: build-ami
     steps:
       - name: Get the current instance id
         id: get_id
