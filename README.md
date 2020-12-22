@@ -1,4 +1,6 @@
-# sow-rest
+# Glasswall Rebuild (running on Kubernetes)
+
+See [Documentation here](documentation.md)
 
 ## Deployment
 
