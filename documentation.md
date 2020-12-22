@@ -49,7 +49,7 @@ The service will be available on `http://localhost`.
         kubectl get all --all-namespaces
         ```
     - Once cluster is ready, run `helm install k8-rebuild kubernetes`
-    - Once it's running, run the command `kubectl get svc`
+    - The service should be running in your cluster as a NodePort.
     
 ## Use cases
 
