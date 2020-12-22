@@ -1,0 +1,6 @@
+monitoring:
+  elasticsearch:
+    host: 91.109.26.22
+    port: 9200
+    username: elastic
+    password: changeme
