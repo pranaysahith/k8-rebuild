@@ -88,7 +88,7 @@ jobs:
       - name: Checkout submodules
         uses: actions/checkout@v2
         with:
-          repository: MariuszFerdyn/vmware-scripts
+          repository: k8-proxy/vmware-scripts
           path: vmware-scripts
 
       - name: Run tests on the VM
