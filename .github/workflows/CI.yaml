@@ -83,6 +83,7 @@ jobs:
           instance_ip=$(echo $instance_description | jq -r ".Reservations[0].Instances[0].PublicIpAddress")
           echo "Access the application at http://${instance_ip}"
           echo ::set-output name=instance_ip::$instance_ip
+          echo ::set-output name=instance_id::$instance_id
       - name: Checkout submodules
         uses: actions/checkout@v2
         with:
@@ -91,21 +92,20 @@ jobs:
 
       - name: Run tests on the VM
         run: |
-          echo "Add api tests here for ${{ steps.deploy.outputs.instance_id }}"
+          instance_id="${{ steps.deploy.outputs.instance_id }}"
           instance_ip="${{ steps.deploy.outputs.instance_ip }}"
           cd vmware-scripts/HealthFunctionalTests/filedrop
           npm install
           sed -i "s/3.133.161.191/$instance_ip/g" cypress/integration/filedrop.spec.js
           npm test 2>&1 | grep ' All specs passed! '
-          echo $?
-
-      - name: Delete older VM
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
-        run: |
-          instance_id="${{ steps.get_id.outputs.instance_id }}"
-          if [[ ! -z "$instance_id" ]]; then
-            aws ec2 terminate-instances --instance-ids $instance_id
+          test_status=$(echo $?)
+          if [[ "$test_status" -ne 0 ]]; then
+              echo "Failed integration tests, terminating the newly deployed VM"
+              aws ec2 terminate-instances $instance_id
+          else
+              echo "Tests are successfully on new VM, terminating old instance."
+              instance_id="${{ steps.get_id.outputs.instance_id }}"
+              if [[ ! -z "$instance_id" ]]; then
+                aws ec2 terminate-instances --instance-ids $instance_id
+              fi
           fi
