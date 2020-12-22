@@ -36,6 +36,7 @@ jobs:
 
       - name: Run tests on the VM
         run: |
+          #!/bin/bash
           # echo "Add api tests here for ${{ steps.deploy.outputs.instance_id }}"
           # instance_ip="${{ steps.deploy.outputs.instance_ip }}"
           instance_ip="54.75.57.181"
