@@ -10,7 +10,8 @@ on:
   push:
     branches: [ main ]
     paths-ignore: 
-      - 'sow-rest-*'
+      - 'documentation.md'
+      - 'monitoring'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
