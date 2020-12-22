@@ -65,5 +65,4 @@ Health Check Functional script for File Drop is also created. It checks:
 - Upload of a PDF file
 - Getting the rebuild PDF file and XML report
 
-More details about Healthcheck implementation and usage can be found on [HealthFunctionalTests](https://github.com/k8-proxy/vmware-scripts/tree/main/HealthFunctionalTests/filedrop) and corresponding video
-[Health Check](https://www.youtube.com/watch?v=SaoC-gYxzJY)
+More details about Healthcheck implementation and usage can be found on [HealthFunctionalTests](https://github.com/k8-proxy/vmware-scripts/tree/main/HealthFunctionalTests/filedrop)
