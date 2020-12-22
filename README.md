@@ -27,4 +27,4 @@ NOTES
         REACT_APP_FILETYPEDETECTION_API_ENDPOINT = 'http://localhost:8888'
         REACT_APP_REBUILD_API_ENDPOINT = 'http://localhost:8888'
 
-- Can be choosed arbitrary port instead of **8888** 
+- Can be chosen arbitrary port instead of **8888** 
