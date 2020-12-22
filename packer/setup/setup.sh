@@ -43,10 +43,10 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install docker-ce docker-ce-cli cont
 sudo docker run -d -p 30500:5000 --restart always --name registry registry:2
 
 # build images
-sudo docker build sow-rest-api -f sow-rest-api/Source/Service/Dockerfile -t localhost:30500/sow-rest-api
-sudo docker push localhost:30500/sow-rest-api
-sudo docker build sow-rest-UI/app -f sow-rest-UI/app/Dockerfile -t localhost:30500/sow-rest-ui
-sudo docker push localhost:30500/sow-rest-ui
+sudo docker build k8-rebuild-rest-api -f k8-rebuild-rest-api/Source/Service/Dockerfile -t localhost:30500/k8-rebuild-rest-api
+sudo docker push localhost:30500/k8-rebuild-rest-api
+sudo docker build k8-rebuild-file-drop/app -f k8-rebuild-file-drop/app/Dockerfile -t localhost:30500/k8-rebuild-file-drop
+sudo docker push localhost:30500/k8-rebuild-file-drop
 
 # TODO: remove this
 mkdir -p kubernetes/templates
@@ -74,13 +74,13 @@ cat >> kubernetes/values.yaml <<EOF
 sow-rest-api:
   image:
     registry: localhost:30500
-    repository: sow-rest-api
+    repository: k8-rebuild-rest-api
     imagePullPolicy: Never
     tag: latest
 sow-rest-ui:
   image:
     registry: localhost:30500
-    repository: sow-rest-ui
+    repository: k8-rebuild-file-drop
     imagePullPolicy: Never
     tag: latest
 EOF

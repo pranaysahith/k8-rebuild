@@ -10,5 +10,5 @@ For every PR merged to master, the workflow will do the following steps:
 - Create AMI from the instance(packer)
 - Find the exisitng EC2 instances with name dev-k8-rebuild
 - Deploy a new EC2 instance with newly created AMI
+- IP address to access the file-drop UI will be displayed in "Deploy AMI to dev" step of "deploy-ami" job
 - Delete the old EC2 instances.
-
