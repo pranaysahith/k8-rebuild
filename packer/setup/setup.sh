@@ -48,27 +48,6 @@ sudo docker push localhost:30500/k8-rebuild-rest-api
 sudo docker build k8-rebuild-file-drop/app -f k8-rebuild-file-drop/app/Dockerfile -t localhost:30500/k8-rebuild-file-drop
 sudo docker push localhost:30500/k8-rebuild-file-drop
 
-# TODO: remove this
-mkdir -p kubernetes/templates
-cat > kubernetes/templates/ingress.yaml <<EOF
-{{ if (eq .Values.nginx.service.type "ClusterIP") }}
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: k8-rebuild
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: "{{ .Release.Name }}-sow-rest"
-            port:
-              number: 80
-{{- end -}}
-EOF
 cat >> kubernetes/values.yaml <<EOF
 
 sow-rest-api:
