@@ -11,7 +11,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: sow-rest
+            name: "{{ .Release.Name }}-sow-rest"
             port: 
               number: 80
 {{- end -}}

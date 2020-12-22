@@ -44,6 +44,7 @@ helm repo add stable https://charts.helm.sh/stable
 helm repo update
 helm upgrade --install docker-registry \
   --set service.type=NodePort \
+  --set persistence.enabled=true \
   --set service.nodePort=30500 stable/docker-registry
 
 # build images
@@ -68,7 +69,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: sow-rest
+            name: "{{ .Release.Name }}-sow-rest"
             port:
               number: 80
 {{- end -}}
