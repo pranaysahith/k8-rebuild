@@ -69,7 +69,7 @@ The service will be available on `http://localhost`.
 
 ## Healthchecks
 Health Check Functional script for File Drop is also created. It checks:
-- File Drop UI is available by opening website: `http://3.133.161.191/`
+- File Drop UI is available by opening website: `http://34.253.140.96/`
 - Login
 - Upload of a PDF file
 - Getting the rebuild PDF file and XML report
