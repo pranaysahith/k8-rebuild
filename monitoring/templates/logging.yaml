@@ -181,13 +181,13 @@ spec:
           - containerPort: 2020
         env:
         - name: FLUENT_ELASTICSEARCH_HOST
-          value: "91.109.26.22"
+          value: "{{ .Values.monitoring.elasticsearch.host }}"
         - name: FLUENT_ELASTICSEARCH_PORT
-          value: "9200"
+          value: "{{ .Values.monitoring.elasticsearch.port }}"
         - name: FLUENT_ELASTICSEARCH_USERNAME
-          value: "elastic"
+          value: "{{ .Values.monitoring.elasticsearch.username }}"
         - name: FLUENT_ELASTICSEARCH_PASSWORD
-          value: "QfQAfyIPS2CDHbE2046v3A"                    
+          value: "{{ .Values.monitoring.elasticsearch.password }}"                    
         volumeMounts:
         - name: varlog
           mountPath: /var/log
