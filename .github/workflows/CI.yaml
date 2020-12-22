@@ -8,7 +8,7 @@ env:
 on:
   workflow_dispatch:
   push:
-    branches: [ main, github_actions ]
+    branches: [ main ]
     paths-ignore: 
       - 'sow-rest-*'
 
