@@ -29,7 +29,8 @@
          },
         "tags": {
             "OS_Version": "Ubuntu-20.04",
-            "Base_AMI_Name": "{{ .SourceAMIName }}"
+            "Base_AMI_Name": "{{ .SourceAMIName }}",
+            "Name": "k8-rebuild"
         },
         "run_tags": {
             "Name": "Packer Builder k8-rebuild",
