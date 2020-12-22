@@ -57,7 +57,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
         run: |
           # instance_id="${{ steps.deploy.outputs.instance_id }}"
-          instance_id=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=dev-k8-rebuild' --output text --query 'Reservations[*].Instances[*].InstanceId')
+          instance_id=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=dev-k8-rebuild' "Name=instance-state-name,Values=running" --output text --query 'Reservations[*].Instances[*].InstanceId')
           echo ::set-output name=instance_id::$instance_id
           
       - name: Deploy AMI to dev
@@ -108,7 +108,7 @@ jobs:
           aws ec2 create-tags --resources $ami_id --tags Key=Test_Result,Value=Success
           instance_id="${{ steps.get_id.outputs.instance_id }}"
           if [[ ! -z "$instance_id" ]]; then
-            aws ec2 terminate-instances --instance-ids $instance_id
+            echo "$instance_id" | while IFS= read -r line ; do aws ec2 terminate-instances --instance-ids $line; done
           fi
 
       - name: Delete instance if tests fail
