@@ -39,13 +39,8 @@ sudo add-apt-repository \
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install docker-ce docker-ce-cli containerd.io -y
 
-# install docker registry
-helm repo add stable https://charts.helm.sh/stable
-helm repo update
-helm upgrade --install docker-registry \
-  --set service.type=NodePort \
-  --set persistence.enabled=true \
-  --set service.nodePort=30500 stable/docker-registry
+# install local docker registry
+sudo docker run -d -p 30500:5000 --restart always --name registry registry:2
 
 # build images
 sudo docker build sow-rest-api -f sow-rest-api/Source/Service/Dockerfile -t localhost:30500/sow-rest-api
