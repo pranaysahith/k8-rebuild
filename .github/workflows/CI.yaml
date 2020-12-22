@@ -120,5 +120,6 @@ jobs:
         run: |
           echo "Failed integration tests, terminating the newly deployed VM"
           instance_id="${{ steps.deploy.outputs.instance_id }}"
+          ami_id="${{ steps.deploy.outputs.ami_id }}"
           aws ec2 terminate-instances --instance-ids $instance_id
           aws ec2 create-tags --resources $ami_id --tags Key=Test_Result,Value=Failed
