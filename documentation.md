@@ -14,8 +14,7 @@ It is combaining:
 
 
 ### The final flow follows the process:
-- ![workflow7](https://user-images.githubusercontent.com/70108899/102874022-30ab6000-4442-11eb-8144-839d063d524b.png)
-
+- ![workflow9](https://user-images.githubusercontent.com/70108899/102883951-175de000-4451-11eb-9ede-0136b9204f0f.png)
 
 ### Deployment of *K8-REBUILD* Using Docker
 
@@ -37,5 +36,12 @@ The service will be available on `http://localhost`.
 - Ability to use zip files in S3 buckets to provide the files needed to be rebuild
 - Detect when files get dropped > get the file > unzip it > put all the files thought the Glasswall engine > capture all rebuilt files in one folder > capture all xml files in another folder > zip both folders > upload zip files to another S3 location 
 
-Whole process can be verified using the healthchecks:
+## Healthchecks
+Health Check Functional script for File Drop is also created. It checks:
+- File Drop UI is available by opening website: `http://3.133.161.191/`
+- Login
+- Upload of a PDF file
+- Getting the rebuild PDF file and XML report
+
+More details about Healthcheck implementation and usage can be found on [HealthFunctionalTests](https://github.com/k8-proxy/vmware-scripts/tree/main/HealthFunctionalTests/filedrop) and corresponding video
 [Health Check](https://glasswallsolu-qbp1117.slack.com/files/U019TEM94L9/F01GZ8B7T8F/health_checks_and_functional_health_checks.mp4)
