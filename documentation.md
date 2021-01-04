@@ -73,3 +73,157 @@ Health Check Functional script for File Drop is also created. It checks:
 
 More details about Healthcheck implementation and usage can be found on [HealthFunctionalTests](https://github.com/k8-proxy/vmware-scripts/tree/main/HealthFunctionalTests/filedrop) and corresponding video
 [Health Check](https://www.youtube.com/watch?v=SaoC-gYxzJY)
+
+## Importing File-Drop OVA to AWS
+
+### Prerequisites
+
+- AWS CLI installation:
+    ```
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
+    ```
+- Create an Amazon S3 bucket to store the exported image through: https://s3.console.aws.amazon.com/ [please note that the bucket must be in the same region that the VM will be imported on]
+- Create an IAM role named `vmimport`:
+    - make sure AWS STS is enabled for the region you're working on
+    - create a file called `trust-policy.json` and add the following:
+    ```
+    {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": { "Service": "vmie.amazonaws.com" },
+            "Action": "sts:AssumeRole",
+            "Condition": {
+                "StringEquals":{
+                "sts:Externalid": "vmimport"
+                }
+            }
+        }
+    ]
+    }
+    ```
+    - run the `create-role` command, specifying the json file created earlier
+    ```
+    aws iam create-role --role-name vmimport --assume-role-policy-document "file://trust-policy.json"
+    ```
+    - create a file called `role-policy.json`, replacing    `disk-image-file-bucket` with the bucket for disk images and `export-bucket` with the bucket for exported images:
+    ```
+    {
+    "Version":"2012-10-17",
+    "Statement":[
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket" 
+            ],
+            "Resource": [
+                "arn:aws:s3:::disk-image-file-bucket",
+                "arn:aws:s3:::disk-image-file-bucket/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetBucketAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::export-bucket",
+                "arn:aws:s3:::export-bucket/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:ModifySnapshotAttribute",
+                "ec2:CopySnapshot",
+                "ec2:RegisterImage",
+                "ec2:Describe*"
+            ],
+            "Resource": "*"
+        }
+    ]
+    }
+    ```
+    - run the `put-role-policy` command to attach the policy to the role created:
+    ```
+    aws iam put-role-policy --role-name vmimport --policy-name vmimport --policy-document "file://role-policy.json"
+    ```
+
+### Importing the OVA
+- run the `import-image` command:
+    ```
+    aws ec2 import-image --description "My server VM" --disk-containers "file://containers.json"
+    ```
+    - an example of `containers.json` file:
+        ```
+        [
+        {
+            "Description": "My Server OVA",
+            "Format": "ova",
+            "UserBucket": {
+                "S3Bucket": "my-import-bucket",
+                "S3Key": "vms/my-server-vm.ova"
+            }
+        }]
+        ```
+- monitor an import image task, replaceing the `task ID`
+    ```
+    aws ec2 describe-import-image-tasks --import-task-ids import-ami-1234567890abcdef0
+    ```
+    - an example of a completed import 
+    ```
+    {
+        "ImportImageTasks": [
+            {
+                "ImportTaskId": "import-ami-01234567890abcdef",
+                "ImageId": "ami-1234567890EXAMPLE",
+                "SnapshotDetails": [
+                    {
+                        "DiskImageSize": 705638400.0,
+                        "Format": "ova",
+                        "SnapshotId": "snap-111222333444aaabb"
+                        "Status": "completed",
+                        "UserBucket": {
+                            "S3Bucket": "my-import-bucket",
+                            "S3Key": "vms/my-server-vm.ova"
+                        }
+                    }
+                ],
+                "Status": "completed"
+            }
+        ]
+    }
+    ```
+
+### Launching instance
+
+- navigate to EC2 console: https://console.aws.amazon.com/ec2/
+- change region to the region of imported VM
+- from the dashboard, choose `Launch instance`, and on the top right, choose `Search by Systems Manager Parameter` and search by `ImageId` from the earlier import output.
+- select the AMI from the list and choose `Select` > choose `t2.micro`
+- Review Instance Launch and select or create Key Pair. When key pair is downloaded and all information is reviewed, you can launch the VM.
+- Enable inbound traffic to your instance by clicking on your instance's ID > security > Edit inbound rule > add rule > Type: SSH > source: 0.0.0.0/0
+- to SSH into the instance, you need to run the following command first:
+    ```
+    chmod 400 my-key-pair.pem
+    ```
+    - you can now SSH into the instance by running, replace `my-instance-user-name` with `user` and `my-instance-public-dns-name` can be found in instance details > Public IPv4 DNS:
+        ```
+        ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
+        ```
+    - use the password `secret`
+- restart k3s service 
+    ```
+    sudo systemctl restart k3s
+    ```
+- From a web browser, navigate to the VM IP address over HTTP and port 30080 (i.e: http://:30080) to access the UI
+- Click on login (no credentials needed) and rebuild a file
