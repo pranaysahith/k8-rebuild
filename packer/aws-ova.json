@@ -14,19 +14,11 @@
         "instance_type": "t3.large",
         "region": "{{user `region`}}",
         "secret_key": "{{user `aws_secret_key`}}",
-        "ssh_username": "ubuntu",
+        "ssh_username": "ec2-user",
         "ssh_timeout": "20m",
         "type": "amazon-ebs",
         "ami_regions": ["eu-west-1"],
-        "source_ami_filter": {
-            "filters": {
-            "virtualization-type": "hvm",
-            "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
-            "root-device-type": "ebs"
-            },
-            "owners": ["099720109477"],
-            "most_recent": true
-         },
+        "source_ami": "ami-01720b5f421cf0179",
         "tags": {
             "OS_Version": "Ubuntu-20.04",
             "Base_AMI_Name": "{{ .SourceAMIName }}",

@@ -14,23 +14,14 @@ curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 
 echo "Done installing helm"
 
 # get source code
+sudo yum install -y git
 git clone https://github.com/k8-proxy/k8-rebuild.git --recursive && cd k8-rebuild && git submodule foreach git pull origin main
 
 # build docker images
-sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common -y
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install docker-ce docker-ce-cli containerd.io -y
-
+sudo amazon-linux-extras install docker -y
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+sudo chkconfig docker on
 # install local docker registry
 sudo docker run -d -p 30500:5000 --restart always --name registry registry:2
 
