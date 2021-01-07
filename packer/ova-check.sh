@@ -4,7 +4,7 @@ echo $EXPORT_ID
 # increase file size until 1KB
 until [ "$RESPONSE" = "completed" ]
 do
-  RESPONSE=$(aws ec2 describe-export-tasks --export-task-ids $EXPORT_ID | jq -r .ExportTasks[].State)
+  RESPONSE=$(aws ec2 describe-export-tasks --export-task-ids $EXPORT_ID | jq -r '.ExportTasks[].State')
   if [ "$RESPONSE" != "exit" ]; then
     echo "OVA Upload in progress..."
     sleep 30
