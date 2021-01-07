@@ -23,8 +23,8 @@ cat > packer/containers.json <<EOF
       "Description": "filedrop OVA",
       "Format": "ova",
       "UserBucket": {
-          "S3Bucket": "nour-test-bucket",
-          "S3Key": "vms/${OVA_NAME}"
+          "S3Bucket": "glasswall-sow-ova",
+          "S3Key": "vms/SOW-REST/${OVA_NAME}"
       }
     }
 ]
