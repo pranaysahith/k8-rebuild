@@ -113,8 +113,18 @@ More details about Healthcheck implementation and usage can be found on [HealthF
         "AccessKeyId": "access-key-id"
       ```
     - Use session token :
-        - Linux: `export AWS_SESSION_TOKEN=example-session-token-as-in-previous-output`
-        - WIN: `set AWS_SESSION_TOKEN=example-session-Token-as-in-previous-output`
+        - Linux: 
+            ```
+            export AWS_ACCESS_KEY_ID=example-access-key-as-in-previous-output
+            export AWS_SECRET_ACCESS_KEY=example-secret-access-key-as-in-previous-output
+            export AWS_SESSION_TOKEN=example-session-Token-as-in-previous-output
+            ```
+        - WIN: 
+            ```
+            set AWS_ACCESS_KEY_ID=example-access-key-as-in-previous-output
+            set AWS_SECRET_ACCESS_KEY=example-secret-access-key-as-in-previous-output
+            set AWS_SESSION_TOKEN=example-session-Token-as-in-previous-output
+            ```
 
 - [If you are logging in as IAM user](https://docs.aws.amazon.com/vm-import/latest/userguide/vmie_prereqs.html) the following policy should be assinged to user:
     ```
@@ -176,7 +186,9 @@ More details about Healthcheck implementation and usage can be found on [HealthF
     ]
     }
     ```
-- [Create an Amazon S3 bucket](https://s3.console.aws.amazon.com/) (if there is not one in place) to store the exported OVA. Note that the bucket must be in the same region that the VM will be imported on. Copy the OVA you will be using into the bucket and use bucket name in below step (the one where you are replacing `disk-image-file-bucket` with the bucket for disk images and `export-bucket` with the bucket for exported images).
+- [Create an Amazon S3 bucket](https://s3.console.aws.amazon.com/) (if there is not one in place) to store the exported OVA. Note that the bucket must be in the same region that the VM will be imported on. 
+
+- Copy the OVA you will be using into the bucket and use bucket name in below step (the one where you are replacing `disk-image-file-bucket` with the bucket for disk images and `export-bucket` with the bucket for exported images).
 
 - Create an IAM role named `vmimport`. This should be done only once.
     - make sure AWS STS is enabled for the region you're working on
@@ -301,9 +313,9 @@ More details about Healthcheck implementation and usage can be found on [HealthF
 
 ### Launching instance
 
-- navigate to EC2 console: https://console.aws.amazon.com/ec2/
-- change region to the region of imported VM
-- from the dashboard, choose `Launch instance`, and on the top right, choose `Search by Systems Manager Parameter` and search by `ImageId` from the earlier import output.
+- Navigate to EC2 console: https://console.aws.amazon.com/ec2/
+- Change region to the region of imported VM
+- From the dashboard, choose `Launch instance`, and on the top right, choose `Search by Systems Manager Parameter` and search by `ImageId` from the earlier import output.
 - select the AMI from the list and choose `Select` > choose `t2.micro`
 - Review Instance Launch and select or create Key Pair. When key pair is downloaded and all information is reviewed, you can launch the VM.
 - Enable inbound traffic to your instance by clicking on your instance's ID > security > Edit inbound rule > add rule > Type: SSH > source: 0.0.0.0/0
