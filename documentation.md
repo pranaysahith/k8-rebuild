@@ -92,7 +92,8 @@ More details about Healthcheck implementation and usage can be found on [HealthF
         - Download and install msi: https://awscli.amazonaws.com/AWSCLIV2.msi
         - To verify AWS CLI was installed succesufully open CMD and run `aws --version`, result should be like `aws-cli/2.1.1 Python/3.7.4 Windows/10 botocore/2.0.0`
         ```
-- Run `aws configure` to [setup access](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) to AWS account
+- To [setup access](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) to AWS account run: `aws configure`. 
+    - Enter the data for values as they pop up.
     ```
     example:
     AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
@@ -100,7 +101,94 @@ More details about Healthcheck implementation and usage can be found on [HealthF
     Default region name [None]: us-west-2
     Default output format [None]: json
     ```
-- Create an Amazon S3 bucket (if there is not one in place) to store the exported OVA through: https://s3.console.aws.amazon.com/ [please note that the bucket must be in the same region that the VM will be imported on]
+    
+- If your have MFA token enabled for authentication to AWS account you should [set up MFA token authenticate through AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/authenticate-mfa-cli/)
+    - Run: `aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code code-from-token`
+    - Replace arn-of-the-mfa-device with your username and AWS number and enter MFA code as code-from-token 
+    - As a response you will get
+      ```
+        "SecretAccessKey": "secret-access-key",
+        "SessionToken": "temporary-session-token",
+        "Expiration": "expiration-date-time",
+        "AccessKeyId": "access-key-id"
+      ```
+    - Use session token :
+        - Linux: 
+            ```
+            export AWS_ACCESS_KEY_ID=example-access-key-as-in-previous-output
+            export AWS_SECRET_ACCESS_KEY=example-secret-access-key-as-in-previous-output
+            export AWS_SESSION_TOKEN=example-session-Token-as-in-previous-output
+            ```
+        - WIN: 
+            ```
+            set AWS_ACCESS_KEY_ID=example-access-key-as-in-previous-output
+            set AWS_SECRET_ACCESS_KEY=example-secret-access-key-as-in-previous-output
+            set AWS_SESSION_TOKEN=example-session-Token-as-in-previous-output
+            ```
+
+- [If you are logging in as IAM user](https://docs.aws.amazon.com/vm-import/latest/userguide/vmie_prereqs.html) the following policy should be assinged to user:
+    ```
+    {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:DeleteObject",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": ["arn:aws:s3:::mys3bucket","arn:aws:s3:::mys3bucket/*"]
+    }, 
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CancelConversionTask",
+        "ec2:CancelExportTask",
+        "ec2:CreateImage",
+        "ec2:CreateInstanceExportTask",
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "ec2:DescribeConversionTasks",
+        "ec2:DescribeExportTasks",
+        "ec2:DescribeExportImageTasks",
+        "ec2:DescribeImages",
+        "ec2:DescribeInstanceAttribute",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeInstances",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeTags",
+        "ec2:ExportImage",
+        "ec2:ImportInstance",
+        "ec2:ImportVolume",
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:TerminateInstances",
+        "ec2:ImportImage",
+        "ec2:ImportSnapshot",
+        "ec2:DescribeImportImageTasks",
+        "ec2:DescribeImportSnapshotTasks",
+        "ec2:CancelImportTask"
+      ],
+      "Resource": "*"
+    }
+    ]
+    }
+    ```
+- [Create an Amazon S3 bucket](https://s3.console.aws.amazon.com/) (if there is not one in place) to store the exported OVA. Note that the bucket must be in the same region that the VM will be imported on. 
+
+- Copy the OVA you will be using into the bucket and use bucket name in below step (the one where you are replacing `disk-image-file-bucket` with the bucket for disk images and `export-bucket` with the bucket for exported images).
 
 - Create an IAM role named `vmimport`. This should be done only once.
     - make sure AWS STS is enabled for the region you're working on
@@ -170,6 +258,7 @@ More details about Healthcheck implementation and usage can be found on [HealthF
     ]
     }
     ```
+    - If you are adding multiple buckets for the same trust-policy add extra section with your bucket data in between bruckets {}
     - From folder where `role-policy.json` is created, run the `put-role-policy` command to attach the policy to the role created:
     ```
     aws iam put-role-policy --role-name vmimport --policy-name vmimport --policy-document "file://role-policy.json"
@@ -224,9 +313,9 @@ More details about Healthcheck implementation and usage can be found on [HealthF
 
 ### Launching instance
 
-- navigate to EC2 console: https://console.aws.amazon.com/ec2/
-- change region to the region of imported VM
-- from the dashboard, choose `Launch instance`, and on the top right, choose `Search by Systems Manager Parameter` and search by `ImageId` from the earlier import output.
+- Navigate to EC2 console: https://console.aws.amazon.com/ec2/
+- Change region to the region of imported VM
+- From the dashboard, choose `Launch instance`, and on the top right, choose `Search by Systems Manager Parameter` and search by `ImageId` from the earlier import output.
 - select the AMI from the list and choose `Select` > choose `t2.micro`
 - Review Instance Launch and select or create Key Pair. When key pair is downloaded and all information is reviewed, you can launch the VM.
 - Enable inbound traffic to your instance by clicking on your instance's ID > security > Edit inbound rule > add rule > Type: SSH > source: 0.0.0.0/0
