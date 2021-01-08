@@ -5,6 +5,8 @@ if [ "$ENABLE_TLS" = "true" ]
 then
    echo "TLS is enabled"
    sudo mkdir -p /var/lib/rancher/k3s/server/manifests/
+   sudo touch /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+   sudo chmod 777 /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
    sudo cat >> /var/lib/rancher/k3s/server/manifests/traefik-config.yaml <<EOF
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
