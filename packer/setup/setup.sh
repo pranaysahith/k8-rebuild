@@ -53,6 +53,5 @@ helm upgrade --install k8-rebuild \
 
 # create a user
 sudo useradd -p $(openssl passwd -1 glasswall) glasswall
-sudo usermod -aG sudo glasswall
 sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication yes/g" /etc/ssh/sshd_config
-sudo service ssh restart
+sudo service sshd restart
