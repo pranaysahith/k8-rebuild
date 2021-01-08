@@ -1,5 +1,27 @@
 #!/bin/bash
 
+# conditionally enable tls
+if [ "$ENABLE_TLS" = "true" ]
+then
+   echo "TLS is enabled"
+   sudo mkdir -p /var/lib/rancher/k3s/server/manifests/
+   sudo cat >> /var/lib/rancher/k3s/server/manifests/traefik-config.yaml <<EOF
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ssl:
+      enabled: true
+      insecureSkipVerify: true
+      generateTLS: true
+EOF
+else
+   echo "TLS is disabled"
+fi
+
 # install k3s
 curl -sfL https://get.k3s.io | sh -
 mkdir ~/.kube && sudo install -T /etc/rancher/k3s/k3s.yaml ~/.kube/config -m 600 -o $USER
