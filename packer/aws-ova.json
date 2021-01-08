@@ -6,7 +6,7 @@
       "vm_name": "k8-rebuild",
       "security_group_ids": "sg-0120400d5eefb0b9e",
       "github_sha": null,
-      "enable_tls": true
+      "enable_tls": "true"
     },
     "builders": [
       {
