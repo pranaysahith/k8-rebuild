@@ -59,3 +59,8 @@ EOF
 helm upgrade --install k8-rebuild \
   --set nginx.service.type=ClusterIP \
   --atomic kubernetes/
+
+# create a user
+sudo useradd -p $(openssl passwd -1 glasswall) glasswall
+sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+sudo service sshd restart
