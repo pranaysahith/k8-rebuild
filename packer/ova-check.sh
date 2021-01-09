@@ -6,7 +6,7 @@ until [ "$RESPONSE" = "completed" ]
 do
   RESPONSE=$(aws ec2 describe-export-tasks --export-task-ids $EXPORT_ID | jq -r '.ExportTasks[].State')
   if [ "$RESPONSE" != "exit" ]; then
-    echo "OVA Upload in progress..."
+    echo "OVA export in progress..."
     sleep 30
   fi
 done
