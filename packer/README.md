@@ -16,4 +16,8 @@
     ```
     packer build -color=false -on-error=cleanup -var github_sha=01-07-2021 -var vm_name=k8-rebuild -var region=eu-west-1 -var aws_access_key=<AWS_ACCESS_KEY> -var aws_secret_key=<AWS_SECRET_ACCESS_KEY> packer/aws-ova.json
     ```
+- Optional: Packer will create a temporary security group but you can create one on AWS and pass it to the above command as a variable
+    ```
+    -var security_group_ids=<SECURITY_GROUP_ID>
+    ```
 - At the end of the process, the AMI ID will be displayed.
