@@ -90,6 +90,8 @@ data:
         Port            ${FLUENT_ELASTICSEARCH_PORT}
         HTTP_User       ${FLUENT_ELASTICSEARCH_USERNAME}
         HTTP_Passwd     ${FLUENT_ELASTICSEARCH_PASSWORD}
+        tls             ${FLUENT_TLS_USE}
+        tls.verify      ${FLUENT_TLS_VERIFY}
         Logstash_Format On
         Replace_Dots    On
         Retry_Limit     False
@@ -187,7 +189,11 @@ spec:
         - name: FLUENT_ELASTICSEARCH_USERNAME
           value: "{{ .Values.monitoring.elasticsearch.username }}"
         - name: FLUENT_ELASTICSEARCH_PASSWORD
-          value: "{{ .Values.monitoring.elasticsearch.password }}"                    
+          value: "{{ .Values.monitoring.elasticsearch.password }}"     
+        - name: FLUENT_TLS_USE                 
+          value: "{{ .Values.monitoring.elasticsearch.tls_use }}"
+        - name: FLUENT_TLS_VERIFY                 
+          value: "{{ .Values.monitoring.elasticsearch.tls_verify }}"          
         volumeMounts:
         - name: varlog
           mountPath: /var/log

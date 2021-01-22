@@ -4,3 +4,5 @@ monitoring:
     port: 9200
     username: elastic
     password: changeme
+    tls_use: On
+    tls_verify: Off
