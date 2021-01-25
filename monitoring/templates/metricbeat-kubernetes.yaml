@@ -24,7 +24,7 @@ data:
             - config:
                 - module: kubernetes
                   hosts: ["kube-state-metrics:8080"]
-                  period: 10s
+                  period: 1s
                   add_metadata: true
                   metricsets:
                     - state_node
@@ -43,7 +43,7 @@ data:
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   ssl.certificate_authorities:
                     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                  period: 30s
+                  period: 1s
                 # Uncomment this to get k8s events:
                 #- module: kubernetes
                 #  metricsets:
@@ -60,9 +60,20 @@ data:
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      hosts: ['https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+      ssl.verification_mode: "none"
+
+    setup.kibana:
+      host: "${ELASTICSEARCH_HOST}:5601"
+      protocol: "https"
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+      ssl.verification_mode: "none"
+    
+    setup.dashboards:
+      enabled: true
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -74,7 +85,7 @@ metadata:
 data:
   system.yml: |-
     - module: system
-      period: 10s
+      period: 1s
       metricsets:
         - cpu
         - load
@@ -91,7 +102,7 @@ data:
         by_memory: 5   # include top 5 processes by memory
 
     - module: system
-      period: 1m
+      period: 1s
       metricsets:
         - filesystem
         - fsstat
@@ -106,7 +117,7 @@ data:
         - pod
         - container
         - volume
-      period: 10s
+      period: 1s
       host: ${NODE_NAME}
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -119,7 +130,7 @@ data:
     - module: kubernetes
       metricsets:
         - proxy
-      period: 10s
+      period: 1s
       host: ${NODE_NAME}
       hosts: ["localhost:10249"]
 ---
@@ -146,7 +157,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:7.10.1
+        image: docker.elastic.co/beats/metricbeat:7.10.2
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -175,10 +186,11 @@ spec:
           #privileged: true
         resources:
           limits:
-            memory: 200Mi
-          requests:
-            cpu: 100m
+            cpu: 20m
             memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
         volumeMounts:
         - name: config
           mountPath: /etc/metricbeat.yml

@@ -193,7 +193,14 @@ spec:
         - name: FLUENT_TLS_USE                 
           value: "{{ .Values.monitoring.elasticsearch.tls_use }}"
         - name: FLUENT_TLS_VERIFY                 
-          value: "{{ .Values.monitoring.elasticsearch.tls_verify }}"          
+          value: "{{ .Values.monitoring.elasticsearch.tls_verify }}"   
+        resources:
+          limits:
+            cpu: 20m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi                 
         volumeMounts:
         - name: varlog
           mountPath: /var/log
